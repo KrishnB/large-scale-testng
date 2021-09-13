@@ -1,0 +1,41 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+
+plugins {
+    id 'com.github.johnrengelman.shadow' version '7.0.0'
+    id 'java'
+}
+
+group 'org.example'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.testng:testng:6.14.3'
+    implementation 'com.google.guava:guava:30.1.1-jre'
+    shadow 'org.testng:testng:6.14.3'
+}
+
+test {
+    useTestNG()
+}
+
+task runTestsCSV(type: Test) {
+    outputs.upToDateWhen { false }
+    useTestNG {
+        parallel = "methods"
+        threadCount Integer.parseInt(System.getProperty("sessions", "10"))
+        testLogging.showStandardStreams = true
+        useDefaultListeners true
+        listeners << "random.name.tests.TestListener"
+        outputDirectory = file("$buildDir/" + System.getProperty('tags', 'NONE'))
+    }
+}
+
+task testJar(type: ShadowJar) {
+    archiveClassifier.set("alltests")
+    from sourceSets.main.output, sourceSets.test.output
+    configurations = [project.configurations.testRuntimeClasspath]
+}
