@@ -15,5 +15,6 @@ COPY --from=build /home/gradle/src/build/libs/large-scale-testng-1.0-SNAPSHOT-al
 WORKDIR /app
 
 ENV TEST=random.name.tests.set9.nine.Test10.secondTest
+ENV TIMEOUT=3000
 
-CMD java -cp tests.jar -ea -Dtestng.dtd.http=true org.testng.TestNG -methods ${TEST}
+CMD java -cp tests.jar -ea -Dtest.timeout.max=${TIMEOUT} -Dtestng.dtd.http=true org.testng.TestNG -methods ${TEST}
